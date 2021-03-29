@@ -50,8 +50,11 @@ function civicrm_api3_invoicespecialvalues_Get($params) {
     'id' => $contributionId,
   ]);
 
+  // Get the short date format in Date Formats settings.
+  $dateFormat = Civi::Settings()->get('dateformatshortdate');
+
   // Get the received date of the contribution and assign it as a return value
-  $returnValues[0]['receive_date'] = CRM_Utils_Date::customFormat($contribution['values'][0]['receive_date'], '%m/%d/%Y');
+  $returnValues[0]['receive_date'] = CRM_Utils_Date::customFormat($contribution['values'][0]['receive_date'], $dateFormat);
 
   // Get participat payment using contributionId
   $participantPayments = civicrm_api3('ParticipantPayment', 'get', [
@@ -92,7 +95,7 @@ function civicrm_api3_invoicespecialvalues_Get($params) {
 
   // Get Payments payments_received date and amount and assign it as a return value
   foreach ($payments['values'] as $key => $payment) {
-    $returnValues[0]['payments_received'][$key]['date'] = CRM_Utils_Date::customFormat($payment['trxn_date'], '%m/%d/%Y');
+    $returnValues[0]['payments_received'][$key]['date'] = CRM_Utils_Date::customFormat($payment['trxn_date'], $dateFormat);
     $returnValues[0]['payments_received'][$key]['amount'] = $payment['total_amount'];
   }
 
