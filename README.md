@@ -7,13 +7,13 @@ See this at work by adding code like the following to the "Contributions - Invoi
 ```
 {crmAPI var='result' entity='invoicespecialvalues' action='get' id=$id}
 {foreach from=$result.values item=value}
-  {$value.custom_field_value}
-  {$value.receive_date}
+  {$value.custom_field_value}<br>
+  {$value.receive_date}<br>
   {foreach from=$value.participant_names item=participant_name}
-    {$participant_name}
+    {$participant_name}<br>
   {/foreach}
   {foreach from=$value.payments_received item=payment_received}
-    {$payment_received.date} :: {$payment_received.amount}
+    {$payment_received.date} :: {$payment_received.amount}<br>
   {/foreach}
 {/foreach}
 ```
