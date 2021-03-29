@@ -1,38 +1,21 @@
 # Invoice Special Values
 
-![Screenshot](/images/screenshot.png)
+Provides an api invoicespecialvalues.get to provide additional data for invoices.
 
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+See this at work by adding code like the following to the "Contributions - Invoice" message template:
 
-The extension is licensed under [GPL-3.0](LICENSE.txt).
-
-## Requirements
-
-* PHP v7.0+
-* CiviCRM (*FIXME: Version number*)
-
-## Installation (Web UI)
-
-This extension has not yet been published for installation via the web UI.
-
-## Installation (CLI, Zip)
-
-Sysadmins and developers may download the `.zip` file for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-cd <extension-dir>
-cv dl com.joineryhq.invoicespecialvalues@https://github.com/JoineryHQ/com.joineryhq.invoicespecialvalues/archive/master.zip
 ```
-
-## Installation (CLI, Git)
-
-Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) repo for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-git clone https://github.com/JoineryHQ/com.joineryhq.invoicespecialvalues.git
-cv en invoicespecialvalues
+{crmAPI var='result' entity='invoicespecialvalues' action='get' id=$id}
+{foreach from=$result.values item=value}
+  {$value.custom_field_value}<br>
+  {$value.receive_date}<br>
+  {foreach from=$value.participant_names item=participant_name}
+    {$participant_name}<br>
+  {/foreach}
+  {foreach from=$value.payments_received item=payment_received}
+    {$payment_received.date} :: {$payment_received.amount}<br>
+  {/foreach}
+{/foreach}
 ```
 
 ## Support
