@@ -73,7 +73,8 @@ function civicrm_api3_invoicespecialvalues_Get($params) {
     // Get custom field value  of the participant payment and assign it as a return value
     // custom_8 custom field is static for now
     $returnValues[0]['custom_field_value'] = $participants['values'][0]['custom_143'];
-    $returnValues[0]['participant_names'][] = $participants['values'][0]['display_name'];
+    $returnValues[0]['participants'][$participants['values'][0]['participant_id']]['name'] = $participants['values'][0]['display_name'];
+    $returnValues[0]['participants'][$participants['values'][0]['participant_id']]['role'] = $participants['values'][0]['participant_role'];
 
     // Get participant data using registered_by_id as participantPayment['participant_id']
     $participantsRegisteredBy = civicrm_api3('Participant', 'get', [
@@ -83,7 +84,8 @@ function civicrm_api3_invoicespecialvalues_Get($params) {
 
     // Get all participantsRegisteredBy display_name and assign it as a return value
     foreach ($participantsRegisteredBy['values'] as $participantRegisteredBy) {
-      $returnValues[0]['participant_names'][] = $participantRegisteredBy['display_name'];
+      $returnValues[0]['participants'][$participantRegisteredBy['participant_id']]['name'] = $participantRegisteredBy['display_name'];
+      $returnValues[0]['participants'][$participantRegisteredBy['participant_id']]['role'] = $participantRegisteredBy['participant_role'];
     }
   }
 
