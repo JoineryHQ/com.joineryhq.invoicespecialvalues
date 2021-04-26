@@ -101,5 +101,11 @@ function civicrm_api3_invoicespecialvalues_Get($params) {
     $returnValues[0]['payments_received'][$key]['amount'] = $payment['total_amount'];
   }
 
+  // Get payments transaction that we can use in the invoice
+  $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($contributionId, 'contribution', TRUE);
+  if ($paymentInfo['transaction']) {
+    $returnValues[0]['transaction'] = $paymentInfo['transaction'];
+  }
+
   return civicrm_api3_create_success($returnValues, $params, 'Invoicespecialvalues', 'Get');
 }
