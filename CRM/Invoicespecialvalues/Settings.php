@@ -117,8 +117,8 @@ class CRM_Invoicespecialvalues_Settings {
       ],
     ]);
 
-    // Init returnData
-    $returnData = [];
+    // Init customFieldHtmlValues
+    $customFieldHtmlValues = '';
     // Get entity type (Contribution or Participant)
     $entityType = $customField['values'][0]['api.CustomGroup.get']['values'][0]['extends'];
 
@@ -130,16 +130,19 @@ class CRM_Invoicespecialvalues_Settings {
         'id' => $entityId,
       ]);
 
-      // If custom_$customFieldId has value, add it on the returnData as values array
+      // If custom_$customFieldId has value, add it on the customFieldHtmlValues as string with html
       if ($customFieldValue && $customFieldValue['values']['0']["custom_{$customFieldId}"]) {
-        $returnData['values'][] = $customFieldValue['values']['0']["custom_{$customFieldId}"];
+        $customFieldHtmlValues .= '<tr><td>' . $customFieldValue['values']['0']["custom_{$customFieldId}"] . '</td></tr>';
       }
     }
 
-    // If return data have values, add label and return all data,
+    // If customFieldHtmlValues has values, add th for heading and return all html data,
     // if not return false
-    if ($returnData) {
-      $returnData['label'] = $customField['values'][0]['label'];
+    if ($customFieldHtmlValues) {
+      $returnData = "<table>
+        <tr><th>{$customField['values'][0]['label']}</th></tr>
+        {$customFieldHtmlValues}
+      </table>";
       return $returnData;
     }
     else {

@@ -115,7 +115,7 @@ function civicrm_api3_invoicespecialvalues_Get($params) {
 
   // Get all display on invoices custom field and init customFieldData
   $displayOnInvoices = CRM_Invoicespecialvalues_Settings::getFilteredSettings(TRUE, 'custom_field');
-  $customFieldData = [];
+  $customFieldData = '';
 
   // If there is display on invoices custom field, foreach data
   if ($displayOnInvoices) {
@@ -123,14 +123,15 @@ function civicrm_api3_invoicespecialvalues_Get($params) {
       $customFieldLabelAndValues = CRM_Invoicespecialvalues_Settings::getCustomFieldValues($field['custom_field_id'], $displayOnInvoicesIds);
       // If there is a returned data on the getCustomFieldValues add it on customFieldData
       if ($customFieldLabelAndValues) {
-        $customFieldData[] = $customFieldLabelAndValues;
+        $customFieldData .= $customFieldLabelAndValues;
       }
     }
   }
 
   // If customFieldData is not empty, return as custom_fields_html
   if ($customFieldData) {
-    $returnValues[0]['custom_fields_html'] = $customFieldData;
+    // preg_replace to remove unnecesarry line break
+    $returnValues[0]['custom_fields_html'] = preg_replace('/\r|\n/', '', $customFieldData);
   }
 
   return civicrm_api3_create_success($returnValues, $params, 'Invoicespecialvalues', 'Get');
