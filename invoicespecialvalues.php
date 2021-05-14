@@ -30,16 +30,6 @@ function invoicespecialvalues_civicrm_xmlMenu(&$files) {
  */
 function invoicespecialvalues_civicrm_install() {
   _invoicespecialvalues_civix_civicrm_install();
-  // Create the option group where we store the data of the display_on_invoices..
-  // field when extension is intalled
-  $results = \Civi\Api4\OptionGroup::create()
-    ->setCheckPermissions(FALSE)
-    ->addValue('name', 'invoicespecialvalues')
-    ->addValue('title', 'Invoice Special Values Extension Options')
-    ->addValue('is_active', TRUE)
-    ->addValue('is_locked', TRUE)
-    ->addValue('is_reserved', TRUE)
-    ->execute();
 }
 
 /**
@@ -58,11 +48,6 @@ function invoicespecialvalues_civicrm_postInstall() {
  */
 function invoicespecialvalues_civicrm_uninstall() {
   _invoicespecialvalues_civix_civicrm_uninstall();
-  // Delete the option group if extension is uninstall
-  $results = \Civi\Api4\OptionGroup::delete()
-    ->setCheckPermissions(FALSE)
-    ->addWhere('name', '=', 'invoicespecialvalues')
-    ->execute();
 }
 
 /**
