@@ -91,7 +91,6 @@ function civicrm_api3_invoicespecialvalues_Get($params) {
     foreach ($participantsRegisteredBy['values'] as $participantRegisteredBy) {
       $returnValues[0]['participants'][$participantRegisteredBy['participant_id']]['name'] = $participantRegisteredBy['display_name'];
       $returnValues[0]['participants'][$participantRegisteredBy['participant_id']]['role'] = $participantRegisteredBy['participant_role'];
-      $displayOnInvoicesIds['Participant'][] = $participantRegisteredBy['participant_id'];
     }
   }
 
