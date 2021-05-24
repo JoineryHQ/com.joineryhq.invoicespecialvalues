@@ -62,6 +62,9 @@ function civicrm_api3_invoicespecialvalues_Get($params) {
     'contribution_id' => $contributionId,
   ]);
 
+  // Store contribution id and participant id to check if there is a display on invoices field
+  $displayOnInvoicesIds[] = $contributionId;
+
   // Loop participant payment data
   foreach ($participantPayments['values'] as $participantPayment) {
     // Get participant data using id as participantPayment['participant_id']
@@ -81,6 +84,8 @@ function civicrm_api3_invoicespecialvalues_Get($params) {
       'sequential' => 1,
       'registered_by_id' => $participantPayment['participant_id'],
     ]);
+
+    $displayOnInvoicesIds[] = $participantPayment['participant_id'];
 
     // Get all participantsRegisteredBy display_name and assign it as a return value
     foreach ($participantsRegisteredBy['values'] as $participantRegisteredBy) {
@@ -105,6 +110,30 @@ function civicrm_api3_invoicespecialvalues_Get($params) {
   $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($contributionId, 'contribution', TRUE);
   if ($paymentInfo['transaction']) {
     $returnValues[0]['transaction'] = $paymentInfo['transaction'];
+  }
+
+  // Get all display on invoices custom field and init customFieldData
+  $displayOnInvoices = CRM_Invoicespecialvalues_Settings::getFilteredSettings(TRUE, 'custom_field');
+  $customFieldData = [];
+
+  // If there is display on invoices custom field, foreach data
+  if ($displayOnInvoices) {
+    foreach ($displayOnInvoices as $field) {
+      $customFieldId = $field['custom_field_id'];
+      $customFieldLabelAndValues = CRM_Invoicespecialvalues_Settings::getCustomFieldValues($customFieldId, $displayOnInvoicesIds);
+      // If there is a returned data on the getCustomFieldValues add it on customFieldData
+      if ($customFieldLabelAndValues) {
+        $customFieldData['html'] .= $customFieldLabelAndValues['html'];
+        $customFieldData['array']["custom_{$customFieldId}"] = $customFieldLabelAndValues["custom_{$customFieldId}"];
+      }
+    }
+  }
+
+  // If customFieldData is not empty, return as custom_fields_html
+  if ($customFieldData) {
+    // preg_replace to remove unnecesarry line break
+    $returnValues[0]['custom_fields_html'] = preg_replace('/\r|\n/', '', $customFieldData['html']);
+    $returnValues[0]['custom_fields'] = $customFieldData['array'];
   }
 
   return civicrm_api3_create_success($returnValues, $params, 'Invoicespecialvalues', 'Get');

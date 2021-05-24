@@ -170,3 +170,75 @@ function invoicespecialvalues_civicrm_themes(&$themes) {
 //  ));
 //  _invoicespecialvalues_civix_navigationMenu($menu);
 //}
+
+/**
+ * Implements hook_civicrm_buildForm().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_buildForm
+ */
+function invoicespecialvalues_civicrm_buildForm($formName, &$form) {
+  // For custom field edit form
+  if ($formName == 'CRM_Custom_Form_Field') {
+    // Get Custom Group data of the form
+    $customGroup = \Civi\Api4\CustomGroup::get()
+      ->addSelect('extends')
+      ->addWhere('id', '=', $form->getVar('_gid'))
+      ->execute()
+      ->first();
+
+    // If extends is Participant or Contribution, continue
+    if ($customGroup['extends'] == 'Participant' || $customGroup['extends'] == 'Contribution' ) {
+      // Add js for the placing of our injected custom field
+      CRM_Core_Resources::singleton()->addScriptFile('com.joineryhq.invoicespecialvalues', 'js/CRM_Custom_Form_Field.js', 100, 'page-footer');
+
+      // Add custom field checkbox
+      $form->addElement('checkbox', 'display_on_invoices', E::ts('Display on invoices'));
+
+      // Assign bhfe to inject fields on the template.
+      $tpl = CRM_Core_Smarty::singleton();
+      $bhfe = $tpl->get_template_vars('beginHookFormElements');
+      if (!$bhfe) {
+        $bhfe = array();
+      }
+      $bhfe[] = 'display_on_invoices';
+      $form->assign('beginHookFormElements', $bhfe);
+
+      // Set defaults so our field has the right value if form is edit
+      $id = $form->getVar('_id');
+      if ($id) {
+        $settings = CRM_Invoicespecialvalues_Settings::getSettings($id, 'custom_field');
+        $defaults = array(
+          'display_on_invoices' => $settings['display_on_invoices'],
+        );
+        $form->setDefaults($defaults);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_postProcess().
+ *
+ * @link hhttps://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postProcess
+ */
+function invoicespecialvalues_civicrm_postProcess($formName, &$form) {
+  if ($formName == 'CRM_Custom_Form_Field') {
+    // Get Custom Group data of the form
+    $customGroup = \Civi\Api4\CustomGroup::get()
+      ->addSelect('extends')
+      ->addWhere('id', '=', $form->getVar('_gid'))
+      ->execute()
+      ->first();
+
+    // If extends is Participant or Contribution, continue
+    if ($customGroup['extends'] == 'Participant' || $customGroup['extends'] == 'Contribution' ) {
+      // Get the id
+      $id = $form->getVar('_id');
+
+      // Save display_on_invoices with the id
+      $settings = CRM_Invoicespecialvalues_Settings::getSettings($id, 'custom_field');
+      $settings['display_on_invoices'] = $form->_submitValues['display_on_invoices'];
+      CRM_Invoicespecialvalues_Settings::saveAllSettings($id, $settings, 'custom_field');
+    }
+  }
+}
