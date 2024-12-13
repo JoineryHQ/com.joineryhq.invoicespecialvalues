@@ -62,17 +62,14 @@ function civicrm_api3_invoicespecialvalues_Get($params) {
     'contribution_id' => $contributionId,
   ]);
 
-  // Loop participant payment data
+  // Add info on each participant, if any.
   foreach ($participantPayments['values'] as $participantPayment) {
+    $returnValues[0]['participants'] = [];
     // Get participant data using id as participantPayment['participant_id']
     $participants = civicrm_api3('Participant', 'get', [
       'sequential' => 1,
       'id' => $participantPayment['participant_id'],
     ]);
-
-    // Get custom field value  of the participant payment and assign it as a return value
-    // custom_8 custom field is static for now
-    $returnValues[0]['custom_field_value'] = $participants['values'][0]['custom_143'];
     $returnValues[0]['participants'][$participants['values'][0]['participant_id']]['name'] = $participants['values'][0]['display_name'];
     $returnValues[0]['participants'][$participants['values'][0]['participant_id']]['role'] = $participants['values'][0]['participant_role'];
 
