@@ -63,8 +63,8 @@ function civicrm_api3_invoicespecialvalues_Get($params) {
   ]);
 
   // Add info on each participant, if any.
+  $returnValues[0]['participants'] = [];
   foreach ($participantPayments['values'] as $participantPayment) {
-    $returnValues[0]['participants'] = [];
     // Get participant data using id as participantPayment['participant_id']
     $participants = civicrm_api3('Participant', 'get', [
       'sequential' => 1,
